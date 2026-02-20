@@ -5,32 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>WhatsApp Chatbot - Light Mode</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/dist/css/all.min.css">
+    <!-- Memastikan FontAwesome dimuat dengan benar -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500;600&display=swap');
         
         body {
             font-family: 'Segoe UI', "Helvetica Neue", Helvetica, Arial, sans-serif;
-            background-color: #dadbd3; /* Warna background luar di desktop */
+            background-color: #dadbd3;
             height: 100vh;
             margin: 0;
             display: flex;
             justify-content: center;
         }
 
-        /* Container Utama */
         .app-container {
             width: 100%;
             max-width: 500px; 
             height: 100vh;
-            background-color: #efeae2; /* Warna background chat terang WA */
+            background-color: #efeae2;
             display: flex;
             flex-direction: column;
             position: relative;
             overflow: hidden;
         }
 
-        /* Background WhatsApp Doodle (Terang) */
         .chat-bg {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -41,13 +40,12 @@
             filter: contrast(0.5);
         }
 
-        /* Header WA Terang */
         .wa-header {
             background-color: #008069;
             color: white;
         }
 
-        /* Message Bubbles Terang dengan Ekor */
+        /* Bubble Style */
         .message-in {
             background-color: #ffffff;
             color: #111b21;
@@ -88,13 +86,12 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.1); }
 
         .text-wa-time { color: #667781; }
-        .text-wa-blue { color: #53bdeb; }
-        .text-wa-header-icon { color: #ffffff; }
+        .text-wa-blue { color: #53bdeb; } /* Warna centang biru WA */
 
-        /* Tombol Kirim */
+        /* Tombol Kirim Perbaikan */
         .wa-send-btn {
             background-color: #00a884;
-            color: white;
+            color: white !important;
             width: 48px;
             height: 48px;
             border-radius: 50%;
@@ -103,11 +100,16 @@
             justify-content: center;
             box-shadow: 0 1px 2px rgba(0,0,0,0.3);
             flex-shrink: 0;
+            border: none;
+            cursor: pointer;
         }
 
         .wa-send-btn i {
-            font-size: 20px;
-            transform: translateX(2px);
+            font-size: 18px;
+            display: block;
+            color: white !important;
+            /* Sedikit kemiringan agar pas di tengah mata */
+            transform: translateX(2px) translateY(0px);
         }
         
         * { -webkit-tap-highlight-color: transparent; }
@@ -118,10 +120,10 @@
     <div class="app-container shadow-xl">
         <div class="chat-bg"></div>
         
-        <!-- Header Chat -->
+        <!-- Header -->
         <header class="wa-header p-3 flex items-center justify-between shadow-md z-20 h-[60px] flex-shrink-0">
             <div class="flex items-center space-x-2">
-                <i class="fas fa-arrow-left text-white mr-1 cursor-pointer"></i>
+                <i class="fa-solid fa-arrow-left text-white mr-1 cursor-pointer"></i>
                 <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border border-gray-100">
                     <img id="display-avatar" src="" alt="Avatar" class="w-full h-full object-cover">
                 </div>
@@ -131,22 +133,22 @@
                 </div>
             </div>
             <div class="flex items-center space-x-5 text-white text-lg pr-1">
-                <i class="fas fa-video"></i>
-                <i class="fas fa-phone-alt"></i>
-                <i id="admin-setting-btn" onclick="toggleModal('setup-modal')" class="fas fa-link cursor-pointer hidden"></i>
-                <i class="fas fa-ellipsis-v cursor-pointer"></i>
+                <i class="fa-solid fa-video"></i>
+                <i class="fa-solid fa-phone"></i>
+                <i id="admin-setting-btn" onclick="toggleModal('setup-modal')" class="fa-solid fa-link cursor-pointer hidden"></i>
+                <i class="fa-solid fa-ellipsis-vertical cursor-pointer"></i>
             </div>
         </header>
 
-        <!-- Area Pesan -->
+        <!-- Chat Container -->
         <main id="chat-container" class="flex-1 overflow-y-auto p-3 space-y-3 custom-scrollbar z-10">
-            <!-- Chat akan masuk di sini -->
+            <!-- Messages go here -->
         </main>
 
-        <!-- Footer Input -->
+        <!-- Footer -->
         <footer class="bg-transparent p-2 flex items-center space-x-2 z-20 flex-shrink-0 mb-1 px-2">
-            <div class="flex-1 bg-white rounded-full flex items-center px-4 py-1 shadow-sm">
-                <i class="far fa-smile text-[#667781] text-2xl mr-3 cursor-pointer"></i>
+            <div class="flex-1 bg-white rounded-full flex items-center px-4 py-1 shadow-sm border border-gray-100">
+                <i class="fa-regular fa-face-smile text-[#667781] text-2xl mr-3 cursor-pointer"></i>
                 <input 
                     type="text" 
                     id="user-input" 
@@ -154,21 +156,21 @@
                     class="bg-transparent text-[#111b21] w-full border-none focus:outline-none text-[16px] placeholder:text-[#667781] py-2.5"
                     onkeypress="handleKeyPress(event)"
                 >
-                <i class="fas fa-paperclip text-[#667781] text-xl ml-2 rotate-45 cursor-pointer"></i>
-                <i class="fas fa-camera text-[#667781] text-xl ml-4 mr-1 cursor-pointer"></i>
+                <i class="fa-solid fa-paperclip text-[#667781] text-xl ml-2 rotate-45 cursor-pointer"></i>
+                <i class="fa-solid fa-camera text-[#667781] text-xl ml-4 mr-1 cursor-pointer"></i>
             </div>
             <button onclick="sendMessage()" class="wa-send-btn active:scale-90 transition-transform">
-                <i class="fas fa-paper-plane"></i>
+                <i class="fa-solid fa-paper-plane"></i>
             </button>
         </footer>
     </div>
 
-    <!-- Modal Setup Admin -->
+    <!-- Modal Admin -->
     <div id="setup-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
         <div class="bg-white text-[#111b21] p-6 rounded-lg max-w-sm w-full shadow-2xl">
             <h2 class="text-xl font-bold text-[#008069] mb-4">Pengaturan Chatbot</h2>
-            <p class="text-xs text-gray-500 mb-4">Masukkan URL CSV Google Sheets Anda (Publish to Web).</p>
-            <input type="text" id="sheet-url-input" placeholder="https://docs.google.com/.../pub?output=csv" class="w-full bg-gray-100 p-3 rounded border border-gray-300 text-sm focus:ring-1 focus:ring-[#00a884] outline-none mb-4">
+            <p class="text-xs text-gray-500 mb-4">Masukkan URL CSV Google Sheets Anda.</p>
+            <input type="text" id="sheet-url-input" placeholder="https://docs.google.com/.../pub?output=csv" class="w-full bg-gray-100 p-3 rounded border border-gray-300 text-sm outline-none mb-4 focus:border-[#00a884]">
             <button onclick="saveSheetUrl()" class="w-full bg-[#00a884] text-white font-bold py-3 rounded hover:bg-[#008069]">SIMPAN</button>
             <button onclick="toggleModal('setup-modal')" class="w-full mt-2 text-gray-400 text-xs underline">Batal</button>
         </div>
@@ -176,12 +178,7 @@
 
     <script>
         let chatData = [];
-        let botSettings = {
-            name: "Customer Bot",
-            avatar: "",
-            greeting: "Halo! Ada yang bisa dibantu?",
-            fallback: "Maaf, admin sedang sibuk."
-        };
+        let botSettings = { name: "Customer Bot", avatar: "", greeting: "Halo! Ada yang bisa kami bantu?", fallback: "Maaf, admin sedang sibuk." };
 
         const chatContainer = document.getElementById('chat-container');
         const userInput = document.getElementById('user-input');
@@ -191,14 +188,14 @@
             const sheetFromUrl = urlParams.get('sheet');
             const savedUrl = localStorage.getItem('wa_global_sheet_url');
 
-            if (sheetFromUrl) {
-                loadAllData(sheetFromUrl);
-            } else if (savedUrl) {
+            if (sheetFromUrl) { loadAllData(sheetFromUrl); }
+            else if (savedUrl) { 
                 document.getElementById('admin-setting-btn').classList.remove('hidden');
-                loadAllData(savedUrl);
-            } else {
+                loadAllData(savedUrl); 
+            }
+            else { 
                 document.getElementById('admin-setting-btn').classList.remove('hidden');
-                toggleModal('setup-modal');
+                toggleModal('setup-modal'); 
             }
         };
 
@@ -209,9 +206,7 @@
             if (url && url.includes('output=csv')) {
                 localStorage.setItem('wa_global_sheet_url', url);
                 location.reload();
-            } else {
-                alert("Link CSV tidak valid!");
-            }
+            } else { alert("Link CSV tidak valid!"); }
         }
 
         async function loadAllData(url) {
@@ -234,19 +229,14 @@
                         tempChatData.push({ keyword: key.toLowerCase(), response: val });
                     }
                 });
-
                 chatData = tempChatData;
                 applySettings();
-            } catch (e) {
-                console.error("Gagal memuat data", e);
-            }
+            } catch (e) { console.error(e); }
         }
 
         function applySettings() {
             document.getElementById('display-name').innerText = botSettings.name;
-            const avatarUrl = botSettings.avatar || `https://ui-avatars.com/api/?name=${botSettings.name}&background=00a884&color=fff`;
-            document.getElementById('display-avatar').src = avatarUrl;
-            
+            document.getElementById('display-avatar').src = botSettings.avatar || `https://ui-avatars.com/api/?name=${botSettings.name}&background=00a884&color=fff`;
             chatContainer.innerHTML = '';
             addMessageToUI(botSettings.greeting, 'in');
         }
@@ -267,10 +257,11 @@
             const msgDiv = document.createElement('div');
             msgDiv.className = `flex ${type === 'out' ? 'justify-end' : 'justify-start'} mb-1`;
             
-            const checkIcon = '<i class="fas fa-check-double text-[10px] text-wa-blue ml-1"></i>';
+            // Perbaikan centang dua biru agar lebih solid tampilannya
+            const checkIcon = `<i class="fa-solid fa-check-double text-[10px] text-wa-blue ml-1"></i>`;
 
             msgDiv.innerHTML = `
-                <div class="${type === 'out' ? 'message-out' : 'message-in'} p-1.5 px-2.5 max-w-[85%]">
+                <div class="${type === 'out' ? 'message-out' : 'message-in'} p-1.5 px-2.5 max-w-[85%] z-10">
                     <p class="text-[15px] leading-snug break-words">${text.replace(/\n/g, '<br>')}</p>
                     <div class="flex items-center justify-end space-x-1 mt-0.5">
                         <span class="text-[10px] text-wa-time opacity-80">${time}</span>
