@@ -133,7 +133,6 @@
             <div class="flex items-center space-x-5 text-white pr-1">
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="white"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"></path></svg>
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"></path></svg>
-                <!-- Ikon Gear tetap ada untuk Admin mengganti link jika perlu -->
                 <svg id="admin-setting-btn" onclick="toggleModal('setup-modal')" class="hidden cursor-pointer" viewBox="0 0 24 24" width="22" height="22" fill="white"><path d="M12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5zm7-4.5c.01-.33.05-.66.05-1s-.04-.67-.05-1l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.01.2 13.81 0 13.57 0h-4c-.24 0-.44.2-.48.44l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L3.05 9c-.01.33-.05.66-.05 1s.04.67.05 1L.94 12.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.31.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.04.24.24.44.48.44h4c.24 0 .44-.2.48-.44l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64L19 11z"></path></svg>
             </div>
         </header>
@@ -180,24 +179,22 @@
         const userInput = document.getElementById('user-input');
 
         window.onload = () => {
-            // Logika baru: Ambil URL dari parameter link (?s=...)
+            // Ambil URL parameter 's'
             const urlParams = new URLSearchParams(window.location.search);
-            const sheetFromUrl = urlParams.get('s'); // s singkatan dari sheet
-            
+            const sheetFromUrl = urlParams.get('s'); 
             const savedLocalUrl = localStorage.getItem('wa_global_sheet_url');
 
-            // Prioritas: 1. Link Parameter, 2. LocalStorage
+            // Jika ada parameter 's' di link, prioritaskan itu
             if (sheetFromUrl) {
-                // Jika ada di link, gunakan itu dan simpan ke local storage agar awet
-                let decodedUrl = decodeURIComponent(sheetFromUrl);
-                // Pastikan formatnya benar
-                if (!decodedUrl.includes('output=csv')) {
-                    // Coba bantu perbaiki jika user lupa menambahkan output=csv
-                    if (decodedUrl.includes('/pubhtml')) {
-                        decodedUrl = decodedUrl.replace('/pubhtml', '/pub?output=csv');
-                    }
+                let finalUrl = sheetFromUrl;
+                // Jika URL mengandung parameter tambahan (seperti output=csv), URLSearchParams mungkin memotongnya.
+                // Kita ambil sisa string URL jika perlu untuk memastikan link Google Sheet utuh.
+                const fullUrl = window.location.href;
+                if (fullUrl.includes('?s=')) {
+                    finalUrl = fullUrl.split('?s=')[1];
                 }
-                loadAllData(decodedUrl);
+                
+                loadAllData(decodeURIComponent(finalUrl));
             } else if (savedLocalUrl) { 
                 document.getElementById('admin-setting-btn').classList.remove('hidden');
                 loadAllData(savedLocalUrl); 
@@ -241,7 +238,7 @@
                 applySettings();
             } catch (e) { 
                 console.error(e);
-                addMessageToUI("Gagal memuat data. Pastikan link Google Sheet sudah di-publish sebagai CSV.", 'in');
+                addMessageToUI("Gagal memuat data otomatis.", 'in');
             }
         }
 
