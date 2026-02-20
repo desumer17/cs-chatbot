@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WhatsApp Chatbot - Light Mode</title>
+    <title>WhatsApp Chatbot - Fixed Icons</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500;600&display=swap');
@@ -38,9 +38,11 @@
             filter: contrast(0.5);
         }
 
+        /* Header Style */
         .wa-header {
             background-color: #008069;
             color: white;
+            z-index: 30;
         }
 
         /* Bubble Style */
@@ -83,9 +85,6 @@
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.1); }
 
-        .text-wa-time { color: #667781; }
-        .text-wa-blue { color: #53bdeb; }
-
         /* Tombol Kirim */
         .wa-send-btn {
             background-color: #00a884;
@@ -99,13 +98,16 @@
             flex-shrink: 0;
             border: none;
             cursor: pointer;
-            padding: 0;
         }
 
-        .wa-send-btn svg {
-            width: 24px;
-            height: 24px;
-            fill: white;
+        /* Meta info positioning */
+        .msg-meta {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-top: -4px;
+            margin-bottom: -2px;
+            margin-right: -2px;
         }
         
         * { -webkit-tap-highlight-color: transparent; }
@@ -117,9 +119,8 @@
         <div class="chat-bg"></div>
         
         <!-- Header -->
-        <header class="wa-header p-3 flex items-center justify-between shadow-md z-20 h-[60px] flex-shrink-0">
+        <header class="wa-header p-3 flex items-center justify-between shadow-md h-[60px] flex-shrink-0">
             <div class="flex items-center space-x-2">
-                <!-- Ikon Back -->
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="white" class="cursor-pointer"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path></svg>
                 <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border border-gray-100">
                     <img id="display-avatar" src="" alt="Avatar" class="w-full h-full object-cover">
@@ -130,41 +131,31 @@
                 </div>
             </div>
             <div class="flex items-center space-x-5 text-white pr-1">
-                <!-- Ikon Video -->
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="white"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"></path></svg>
-                <!-- Ikon Call -->
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"></path></svg>
-                <!-- Ikon Settings (Admin) -->
                 <svg id="admin-setting-btn" onclick="toggleModal('setup-modal')" class="hidden cursor-pointer" viewBox="0 0 24 24" width="22" height="22" fill="white"><path d="M12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5zm7-4.5c.01-.33.05-.66.05-1s-.04-.67-.05-1l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.01.2 13.81 0 13.57 0h-4c-.24 0-.44.2-.48.44l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L3.05 9c-.01.33-.05.66-.05 1s.04.67.05 1L.94 12.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.31.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.04.24.24.44.48.44h4c.24 0 .44-.2.48-.44l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64L19 11z"></path></svg>
-                <!-- Ikon Menu -->
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="white"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg>
             </div>
         </header>
 
         <!-- Chat Container -->
-        <main id="chat-container" class="flex-1 overflow-y-auto p-3 space-y-3 custom-scrollbar z-10">
-            <!-- Pesan akan dimuat di sini -->
+        <main id="chat-container" class="flex-1 overflow-y-auto p-3 space-y-2 custom-scrollbar z-10">
+            <!-- Messages load here -->
         </main>
 
         <!-- Footer -->
-        <footer class="bg-transparent p-2 flex items-center space-x-2 z-20 flex-shrink-0 mb-1 px-2">
+        <footer class="bg-transparent p-2 flex items-center space-x-2 z-20 mb-1">
             <div class="flex-1 bg-white rounded-full flex items-center px-4 py-1 shadow-sm border border-gray-100">
-                <!-- Ikon Emoji -->
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="#667781" class="mr-3 cursor-pointer"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"></path></svg>
                 <input 
                     type="text" 
                     id="user-input" 
                     placeholder="Ketik pesan" 
-                    class="bg-transparent text-[#111b21] w-full border-none focus:outline-none text-[16px] placeholder:text-[#667781] py-2.5"
+                    class="bg-transparent text-[#111b21] w-full border-none focus:outline-none text-[16px] py-2"
                     onkeypress="handleKeyPress(event)"
                 >
-                <!-- Ikon Lampiran -->
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="#667781" class="ml-2 rotate-45 cursor-pointer"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.31 2.69 6 6 6s6-2.69 6-6V6h-1.5z"></path></svg>
-                <!-- Ikon Kamera -->
-                <svg viewBox="0 0 24 24" width="24" height="24" fill="#667781" class="ml-4 mr-1 cursor-pointer"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path></svg>
             </div>
-            <!-- Tombol Kirim dengan Ikon Pesawat Kertas SVG -->
-            <button onclick="sendMessage()" class="wa-send-btn active:scale-90 transition-transform">
+            <button onclick="sendMessage()" class="wa-send-btn">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
             </button>
         </footer>
@@ -174,10 +165,9 @@
     <div id="setup-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
         <div class="bg-white text-[#111b21] p-6 rounded-lg max-w-sm w-full shadow-2xl">
             <h2 class="text-xl font-bold text-[#008069] mb-4">Pengaturan Chatbot</h2>
-            <p class="text-xs text-gray-500 mb-4">Masukkan URL CSV Google Sheets Anda.</p>
-            <input type="text" id="sheet-url-input" placeholder="https://docs.google.com/.../pub?output=csv" class="w-full bg-gray-100 p-3 rounded border border-gray-300 text-sm outline-none mb-4 focus:border-[#00a884]">
+            <input type="text" id="sheet-url-input" placeholder="URL CSV Google Sheets" class="w-full bg-gray-100 p-3 rounded border border-gray-300 text-sm outline-none mb-4 focus:border-[#00a884]">
             <button onclick="saveSheetUrl()" class="w-full bg-[#00a884] text-white font-bold py-3 rounded hover:bg-[#008069]">SIMPAN</button>
-            <button onclick="toggleModal('setup-modal')" class="w-full mt-2 text-gray-400 text-xs underline">Batal</button>
+            <button onclick="toggleModal('setup-modal')" class="w-full mt-2 text-gray-400 text-xs underline cursor-pointer">Batal</button>
         </div>
     </div>
 
@@ -189,16 +179,11 @@
         const userInput = document.getElementById('user-input');
 
         window.onload = () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const sheetFromUrl = urlParams.get('sheet');
             const savedUrl = localStorage.getItem('wa_global_sheet_url');
-
-            if (sheetFromUrl) { loadAllData(sheetFromUrl); }
-            else if (savedUrl) { 
+            if (savedUrl) { 
                 document.getElementById('admin-setting-btn').classList.remove('hidden');
                 loadAllData(savedUrl); 
-            }
-            else { 
+            } else { 
                 document.getElementById('admin-setting-btn').classList.remove('hidden');
                 toggleModal('setup-modal'); 
             }
@@ -262,19 +247,19 @@
             const msgDiv = document.createElement('div');
             msgDiv.className = `flex ${type === 'out' ? 'justify-end' : 'justify-start'} mb-1`;
             
-            // Ikon Centang Biru Ganda SVG
-            const checkIcon = `
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="#53bdeb" class="ml-1">
-                    <path d="M12 17.27L4.5 9.77l1.41-1.41L12 14.44l8.59-8.59L22 7.27l-10 10zM12 14.44l-1.41-1.41L4.5 19.1l1.41 1.41L12 14.44zm10-7.17l-1.41-1.41L12 14.44l1.41 1.41L22 7.27z"></path>
-                    <path d="M12 17.27L4.5 9.77l1.41-1.41L12 14.44l8.59-8.59L22 7.27l-10 10z"></path>
+            // Ikon Double Tick Biru (Hanya untuk pesan User/Kanan)
+            const doubleTickIcon = `
+                <svg viewBox="0 0 16 11" width="16" height="11" fill="none" class="ml-1">
+                    <path d="M1.5 5.5L4.5 8.5L10.5 1.5" stroke="#53bdeb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M5.5 5.5L8.5 8.5L14.5 1.5" stroke="#53bdeb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>`;
 
             msgDiv.innerHTML = `
                 <div class="${type === 'out' ? 'message-out' : 'message-in'} p-1.5 px-2.5 max-w-[85%] z-10">
-                    <p class="text-[15px] font-normal leading-snug break-words">${text.replace(/\n/g, '<br>')}</p>
-                    <div class="flex items-center justify-end space-x-1 mt-0.5">
-                        <span class="text-[10px] text-wa-time opacity-80">${time}</span>
-                        ${type === 'out' ? checkIcon : ''}
+                    <p class="text-[14.5px] leading-tight break-words mb-1 pr-1">${text.replace(/\n/g, '<br>')}</p>
+                    <div class="msg-meta">
+                        <span class="text-[10px] text-[#667781] mr-0.5">${time}</span>
+                        ${type === 'out' ? doubleTickIcon : ''}
                     </div>
                 </div>
             `;
