@@ -12,24 +12,35 @@
             --app-height: 100%;
         }
 
+        /* Mengunci seluruh body agar tidak bisa discroll secara manual */
         html, body {
             overflow: hidden;
             height: 100%;
             width: 100%;
-            position: fixed; /* Mencegah overscroll/bounce di iOS & Android */
+            margin: 0;
+            padding: 0;
+            position: fixed;
             background-color: #dadbd3;
             font-family: 'Segoe UI', "Helvetica Neue", Helvetica, Arial, sans-serif;
+            /* Mencegah efek membal saat ditarik di HP */
+            overscroll-behavior: none;
         }
 
+        /* Kontainer Utama yang benar-benar fullscreen */
         .app-shell {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             width: 100%;
-            max-width: 500px;
+            max-width: 500px; /* Batas lebar untuk desktop agar tetap proporsional */
             margin: 0 auto;
             height: var(--app-height);
             display: flex;
             flex-direction: column;
             background-color: #efeae2;
-            position: relative;
+            overflow: hidden;
         }
 
         .chat-wallpaper {
@@ -41,7 +52,7 @@
             z-index: 0;
         }
 
-        /* Header Fix */
+        /* Header Statis */
         .header {
             height: 59px;
             background-color: #008069;
@@ -53,7 +64,7 @@
             flex-shrink: 0;
         }
 
-        /* Chat Area Fix */
+        /* Area Chat yang bisa discroll */
         .chat-area {
             flex: 1;
             overflow-y: auto;
@@ -62,12 +73,13 @@
             display: flex;
             flex-direction: column;
             gap: 4px;
+            /* Scroll halus di mobile */
             -webkit-overflow-scrolling: touch;
         }
 
-        /* Footer Fix */
+        /* Footer Statis di bawah */
         .footer {
-            background: transparent;
+            background: #f0f2f5;
             padding: 8px;
             display: flex;
             align-items: flex-end;
@@ -141,6 +153,7 @@
             margin-bottom: -4px;
         }
 
+        /* Custom Scrollbar */
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); }
     </style>
@@ -150,7 +163,7 @@
     <div class="app-shell" id="app-shell">
         <div class="chat-wallpaper"></div>
         
-        <!-- Header -->
+        <!-- Header Profil -->
         <header class="header shadow-sm">
             <div class="flex items-center w-full">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="white" class="mr-1"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path></svg>
@@ -158,7 +171,7 @@
                     <img id="bot-avatar" src="" alt="" class="w-full h-full object-cover">
                 </div>
                 <div class="ml-3 flex-1 overflow-hidden">
-                    <h1 id="bot-name" class="font-semibold text-[16px] truncate">Memuat...</h1>
+                    <h1 id="bot-name" class="font-semibold text-[16px] truncate text-white">Memuat...</h1>
                     <p class="text-[12px] text-white/80 -mt-1">online</p>
                 </div>
                 <div class="flex items-center space-x-4">
@@ -167,12 +180,12 @@
             </div>
         </header>
 
-        <!-- Chat Area -->
+        <!-- Area Pesan -->
         <main id="chat-container" class="chat-area custom-scrollbar">
             <!-- Pesan dimuat di sini -->
         </main>
 
-        <!-- Input Footer -->
+        <!-- Bar Input di bawah -->
         <footer class="footer">
             <div class="input-pill">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="#667781" class="mr-2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"></path></svg>
@@ -182,6 +195,7 @@
                     placeholder="Ketik pesan" 
                     class="w-full bg-transparent border-none outline-none text-[16px] py-2"
                     onkeypress="if(event.key==='Enter') send()"
+                    autocomplete="off"
                 >
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="#667781" class="ml-2 rotate-45"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.31 2.69 6 6 6s6-2.69 6-6V6h-1.5z"></path></svg>
             </div>
@@ -191,25 +205,28 @@
         </footer>
     </div>
 
-    <!-- Modal Setup -->
+    <!-- Modal Admin -->
     <div id="setup-modal" class="fixed inset-0 bg-black/60 z-[200] flex items-center justify-center p-6 hidden">
-        <div class="bg-white rounded-lg w-full max-w-sm p-6">
+        <div class="bg-white rounded-lg w-full max-w-sm p-6 shadow-2xl">
             <h2 class="text-xl font-bold mb-4 text-[#008069]">Setup CSV URL</h2>
-            <input type="text" id="csv-input" class="w-full border p-3 rounded mb-4" placeholder="Paste link CSV di sini">
-            <button onclick="saveCSV()" class="w-full bg-[#00a884] text-white py-3 rounded font-bold">SIMPAN</button>
+            <input type="text" id="csv-input" class="w-full border p-3 rounded mb-4 outline-none focus:border-[#008069]" placeholder="Tempel link CSV di sini">
+            <button onclick="saveCSV()" class="w-full bg-[#00a884] text-white py-3 rounded font-bold hover:bg-[#008069] transition-colors">SIMPAN</button>
             <p onclick="closeSetup()" class="text-center mt-4 text-gray-400 text-sm cursor-pointer underline">Batal</p>
         </div>
     </div>
 
     <script>
         let chatData = [];
-        let config = { name: "Bot CS", avatar: "", greeting: "Halo!", fallback: "Maaf..." };
+        let config = { name: "Bot Chat", avatar: "", greeting: "Halo! Ada yang bisa saya bantu?", fallback: "Maaf, saya kurang mengerti..." };
         const container = document.getElementById('chat-container');
 
-        // HANDLING VIEWPORT KEYBOARD (SOLUSI FULLSCREEN HP)
+        // KRUSIAL: Menghitung tinggi viewport sebenarnya (menghindari masalah keyboard mobile)
         const updateHeight = () => {
+            // Gunakan visualViewport jika tersedia (mendukung deteksi keyboard lebih akurat)
             const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
             document.documentElement.style.setProperty('--app-height', `${vh}px`);
+            
+            // Paksa scroll ke bawah setiap kali ada perubahan ukuran layar
             setTimeout(() => {
                 container.scrollTop = container.scrollHeight;
             }, 100);
@@ -217,12 +234,11 @@
 
         if (window.visualViewport) {
             window.visualViewport.addEventListener('resize', updateHeight);
-            window.visualViewport.addEventListener('scroll', updateHeight);
         }
         window.addEventListener('resize', updateHeight);
         updateHeight();
 
-        // LOAD DATA
+        // Inisialisasi Data
         window.onload = async () => {
             const params = new URLSearchParams(window.location.search);
             const urlS = params.get('s');
@@ -257,7 +273,7 @@
                     else if (i > 0 && k && v) chatData.push({k: k.toLowerCase(), v: v});
                 });
                 renderUI();
-            } catch (e) { alert("Gagal memuat CSV"); }
+            } catch (e) { console.error("CSV error:", e); }
         }
 
         function renderUI() {
@@ -273,6 +289,8 @@
             if (!val) return;
             addMsg(val, 'out');
             input.value = '';
+            
+            // Simulasikan bot mengetik
             setTimeout(() => {
                 const found = chatData.find(d => val.toLowerCase().includes(d.k));
                 addMsg(found ? found.v : config.fallback, 'in');
@@ -294,7 +312,11 @@
                 </div>
             `;
             container.appendChild(div);
-            container.scrollTop = container.scrollHeight;
+            // Gunakan scroll ke bawah yang stabil
+            container.scrollTo({
+                top: container.scrollHeight,
+                behavior: 'smooth'
+            });
         }
 
         function openSetup() { document.getElementById('setup-modal').classList.remove('hidden'); }
