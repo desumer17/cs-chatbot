@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Chatbot Global - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/dist/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600&display=swap');
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #111b21;
+        }
+
+        .chat-bg {
+            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+            background-color: #0b141a;
+            background-blend-mode: overlay;
+            opacity: 0.9;
+        }
+
+        .message-in {
+            background-color: #202c33;
+            color: #e9edef;
+            border-radius: 0 8px 8px 8px;
+            position: relative;
+        }
+
+        .message-out {
+            background-color: #005c4b;
+            color: #e9edef;
+            border-radius: 8px 0 8px 8px;
+            position: relative;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+
+        .text-wa-gray { color: #8696a0; }
+        .text-wa-green { color: #00a884; }
+    </style>
+</head>
+<body class="h-screen flex items-center justify-center p-0 md:p-4 bg-[#0c1317]">
+
+    <div class="w-full max-w-5xl h-full md:h-[95vh] bg-[#111b21] flex flex-col shadow-2xl overflow-hidden rounded-none md:rounded-lg border border-gray-700">
+        
+        <!-- Header -->
+        <header class="bg-[#202c33] text-[#e9edef] p-3 flex items-center justify-between shadow-md z-10 border-b border-gray-800">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center overflow-hidden">
+                    <img id="display-avatar" src="https://ui-avatars.com/api/?name=Bot&background=00a884&color=fff" alt="Avatar" class="w-full h-full object-cover">
+                </div>
+                <div>
+                    <h1 id="display-name" class="font-semibold text-base leading-tight">Memuat...</h1>
+                    <p class="text-[11px] text-wa-green flex items-center">online</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-5 text-wa-gray text-lg">
+                <i class="fas fa-search cursor-pointer hover:text-white"></i>
+                <!-- Tombol ini hanya untuk set link Google Sheet pertama kali -->
+                <i onclick="toggleModal('setup-modal')" class="fas fa-link cursor-pointer hover:text-white" title="Hubungkan Spreadsheet"></i>
+                <i class="fas fa-ellipsis-v cursor-pointer hover:text-white"></i>
+            </div>
+        </header>
+
+        <!-- Chat Area -->
+        <main id="chat-container" class="flex-1 chat-bg overflow-y-auto p-4 md:p-8 space-y-4 custom-scrollbar">
+            <!-- Chat akan dimuat di sini -->
+        </main>
+
+        <!-- Input Area -->
+        <footer class="bg-[#202c33] p-3 flex items-center space-x-3">
+            <div class="flex space-x-4 px-2 text-wa-gray text-xl">
+                <i class="far fa-smile cursor-pointer hover:text-white"></i>
+                <i class="fas fa-plus cursor-pointer hover:text-white"></i>
+            </div>
+            <input 
+                type="text" 
+                id="user-input" 
+                placeholder="Ketik pesan" 
+                class="flex-1 bg-[#2a3942] text-[#e9edef] p-2.5 px-4 rounded-lg border-none focus:outline-none text-sm placeholder:text-wa-gray"
+                onkeypress="handleKeyPress(event)"
+            >
+            <button onclick="sendMessage()" class="text-wa-gray hover:text-wa-green transition-colors px-2">
+                <i class="fas fa-paper-plane text-2xl"></i>
+            </button>
+        </footer>
+    </div>
+
+    <!-- Modal Setup Awal (Hanya untuk Admin saat pertama kali) -->
+    <div id="setup-modal" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4 hidden">
+        <div class="bg-[#222e35] text-[#e9edef] p-6 rounded-lg max-w-md w-full shadow-2xl border border-gray-700">
+            <h2 class="text-xl font-bold text-wa-green mb-4">Hubungkan Spreadsheet</h2>
+            <p class="text-xs text-wa-gray mb-4">Masukkan URL CSV Google Sheets Anda. Setelah ini, Anda cukup mengedit data lewat Spreadsheet tanpa perlu ke menu ini lagi.</p>
+            <input type="text" id="sheet-url-input" placeholder="https://docs.google.com/.../pub?output=csv" class="w-full bg-[#2a3942] p-3 rounded border-none text-sm focus:ring-1 focus:ring-wa-green outline-none mb-4">
+            <button onclick="saveSheetUrl()" class="w-full bg-[#00a884] text-[#111b21] font-bold py-3 rounded hover:bg-[#06cf9c]">HUBUNGKAN SEKARANG</button>
+        </div>
+    </div>
+
+    <script>
+        let chatData = [];
+        let botSettings = {
+            name: "Customer Bot",
+            avatar: "",
+            greeting: "Halo! Ada yang bisa dibantu?",
+            fallback: "Maaf, admin sedang sibuk."
+        };
+
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+
+        window.onload = () => {
+            const savedUrl = localStorage.getItem('wa_global_sheet_url');
+            if (savedUrl) {
+                loadAllData(savedUrl);
+            } else {
+                toggleModal('setup-modal');
+            }
+        };
+
+        function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
+
+        function saveSheetUrl() {
+            const url = document.getElementById('sheet-url-input').value;
+            if (url.includes('output=csv')) {
+                localStorage.setItem('wa_global_sheet_url', url);
+                location.reload();
+            } else {
+                alert("Gunakan link CSV yang valid!");
+            }
+        }
+
+        async function loadAllData(url) {
+            try {
+                const response = await fetch(url);
+                const csvText = await response.text();
+                const lines = csvText.split('\n');
+
+                // Kita asumsikan struktur Spreadsheet baru:
+                // Baris 1: Header (Keyword, Response)
+                // Baris 2: [CONFIG_NAME], [Nama Bot Anda]
+                // Baris 3: [CONFIG_AVATAR], https://photos.google.com/u/0/albums?hl=es
+                // Baris 4: [CONFIG_GREETING], [Pesan Halo]
+                // Baris 5: [CONFIG_FALLBACK], [Pesan jika tidak ketemu]
+                // Baris 6 ke bawah: Kata kunci chat biasa
+
+                let tempChatData = [];
+                
+                lines.forEach((line, index) => {
+                    const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                    const key = parts[0]?.replace(/"/g, '').trim();
+                    const val = parts[1]?.replace(/"/g, '').trim();
+
+                    if (key === '[CONFIG_NAME]') botSettings.name = val;
+                    else if (key === '[CONFIG_AVATAR]') botSettings.avatar = val;
+                    else if (key === '[CONFIG_GREETING]') botSettings.greeting = val;
+                    else if (key === '[CONFIG_FALLBACK]') botSettings.fallback = val;
+                    else if (index > 0 && key && val) {
+                        tempChatData.push({ keyword: key.toLowerCase(), response: val });
+                    }
+                });
+
+                chatData = tempChatData;
+                applySettings();
+            } catch (e) {
+                console.error("Gagal memuat data", e);
+            }
+        }
+
+        function applySettings() {
+            document.getElementById('display-name').innerText = botSettings.name;
+            if (botSettings.avatar) {
+                document.getElementById('display-avatar').src = botSettings.avatar;
+            } else {
+                document.getElementById('display-avatar').src = `https://ui-avatars.com/api/?name=${botSettings.name}&background=00a884&color=fff`;
+            }
+            
+            chatContainer.innerHTML = '';
+            addMessageToUI(botSettings.greeting, 'in');
+        }
+
+        function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(); }
+
+        function sendMessage() {
+            const text = userInput.value.trim();
+            if (!text) return;
+            addMessageToUI(text, 'out');
+            userInput.value = '';
+            setTimeout(() => processBotResponse(text), 800);
+        }
+
+        function addMessageToUI(text, type) {
+            const now = new Date();
+            const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `flex ${type === 'out' ? 'justify-end' : 'justify-start'} mb-2`;
+            msgDiv.innerHTML = `
+                <div class="${type === 'out' ? 'message-out' : 'message-in'} p-2 px-3 shadow-md max-w-[85%]">
+                    <p class="text-[14px] leading-relaxed">${text.replace(/\n/g, '<br>')}</p>
+                    <div class="flex items-center justify-end space-x-1 mt-1">
+                        <span class="text-[10px] text-wa-gray">${time}</span>
+                        ${type === 'out' ? '<i class="fas fa-check-double text-[10px] text-[#53bdeb]"></i>' : ''}
+                    </div>
+                </div>
+            `;
+            chatContainer.appendChild(msgDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function processBotResponse(inputText) {
+            const input = inputText.toLowerCase();
+            const match = chatData.find(item => input.includes(item.keyword));
+            const reply = match ? match.response : botSettings.fallback;
+            addMessageToUI(reply, 'in');
+        }
+    </script>
+</body>
+</html>
