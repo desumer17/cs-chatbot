@@ -2,106 +2,175 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Chatbot Global - Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WhatsApp Chatbot - Light Mode</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/dist/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500;600&display=swap');
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #111b21;
+            font-family: 'Segoe UI', "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background-color: #dadbd3; /* Warna background luar di desktop */
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
         }
 
+        /* Container Utama */
+        .app-container {
+            width: 100%;
+            max-width: 500px; 
+            height: 100vh;
+            background-color: #efeae2; /* Warna background chat terang WA */
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Background WhatsApp Doodle (Terang) */
         .chat-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
             background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
-            background-color: #0b141a;
-            background-blend-mode: overlay;
-            opacity: 0.9;
+            opacity: 0.08;
+            pointer-events: none;
+            z-index: 0;
+            filter: contrast(0.5);
         }
 
+        /* Header WA Terang */
+        .wa-header {
+            background-color: #008069;
+            color: white;
+        }
+
+        /* Message Bubbles Terang dengan Ekor */
         .message-in {
-            background-color: #202c33;
-            color: #e9edef;
+            background-color: #ffffff;
+            color: #111b21;
             border-radius: 0 8px 8px 8px;
             position: relative;
+            margin-left: 8px;
+            box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
+        }
+
+        .message-in::before {
+            content: "";
+            position: absolute;
+            top: 0; left: -8px;
+            width: 0; height: 0;
+            border-bottom: 10px solid transparent;
+            border-right: 10px solid #ffffff;
         }
 
         .message-out {
-            background-color: #005c4b;
-            color: #e9edef;
+            background-color: #d9fdd3;
+            color: #111b21;
             border-radius: 8px 0 8px 8px;
             position: relative;
+            margin-right: 8px;
+            box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
         }
 
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
+        .message-out::before {
+            content: "";
+            position: absolute;
+            top: 0; right: -8px;
+            width: 0; height: 0;
+            border-bottom: 10px solid transparent;
+            border-left: 10px solid #d9fdd3;
         }
 
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background-color: rgba(255,255,255,0.1);
-            border-radius: 10px;
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.1); }
+
+        .text-wa-time { color: #667781; }
+        .text-wa-blue { color: #53bdeb; }
+        .text-wa-header-icon { color: #ffffff; }
+
+        /* Tombol Kirim */
+        .wa-send-btn {
+            background-color: #00a884;
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            flex-shrink: 0;
         }
 
-        .text-wa-gray { color: #8696a0; }
-        .text-wa-green { color: #00a884; }
+        .wa-send-btn i {
+            font-size: 20px;
+            transform: translateX(2px);
+        }
+        
+        * { -webkit-tap-highlight-color: transparent; }
     </style>
 </head>
-<body class="h-screen flex items-center justify-center p-0 md:p-4 bg-[#0c1317]">
+<body>
 
-    <div class="w-full max-w-5xl h-full md:h-[95vh] bg-[#111b21] flex flex-col shadow-2xl overflow-hidden rounded-none md:rounded-lg border border-gray-700">
+    <div class="app-container shadow-xl">
+        <div class="chat-bg"></div>
         
-        <!-- Header -->
-        <header class="bg-[#202c33] text-[#e9edef] p-3 flex items-center justify-between shadow-md z-10 border-b border-gray-800">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center overflow-hidden">
-                    <img id="display-avatar" src="https://ui-avatars.com/api/?name=Bot&background=00a884&color=fff" alt="Avatar" class="w-full h-full object-cover">
+        <!-- Header Chat -->
+        <header class="wa-header p-3 flex items-center justify-between shadow-md z-20 h-[60px] flex-shrink-0">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-arrow-left text-white mr-1 cursor-pointer"></i>
+                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border border-gray-100">
+                    <img id="display-avatar" src="" alt="Avatar" class="w-full h-full object-cover">
                 </div>
-                <div>
-                    <h1 id="display-name" class="font-semibold text-base leading-tight">Memuat...</h1>
-                    <p class="text-[11px] text-wa-green flex items-center">online</p>
+                <div class="overflow-hidden">
+                    <h1 id="display-name" class="font-semibold text-[16px] leading-tight truncate">Memuat...</h1>
+                    <p class="text-[12px] text-white opacity-90">online</p>
                 </div>
             </div>
-            <div class="flex items-center space-x-5 text-wa-gray text-lg">
-                <i class="fas fa-search cursor-pointer hover:text-white"></i>
-                <!-- Tombol ini hanya untuk set link Google Sheet pertama kali -->
-                <i onclick="toggleModal('setup-modal')" class="fas fa-link cursor-pointer hover:text-white" title="Hubungkan Spreadsheet"></i>
-                <i class="fas fa-ellipsis-v cursor-pointer hover:text-white"></i>
+            <div class="flex items-center space-x-5 text-white text-lg pr-1">
+                <i class="fas fa-video"></i>
+                <i class="fas fa-phone-alt"></i>
+                <i id="admin-setting-btn" onclick="toggleModal('setup-modal')" class="fas fa-link cursor-pointer hidden"></i>
+                <i class="fas fa-ellipsis-v cursor-pointer"></i>
             </div>
         </header>
 
-        <!-- Chat Area -->
-        <main id="chat-container" class="flex-1 chat-bg overflow-y-auto p-4 md:p-8 space-y-4 custom-scrollbar">
-            <!-- Chat akan dimuat di sini -->
+        <!-- Area Pesan -->
+        <main id="chat-container" class="flex-1 overflow-y-auto p-3 space-y-3 custom-scrollbar z-10">
+            <!-- Chat akan masuk di sini -->
         </main>
 
-        <!-- Input Area -->
-        <footer class="bg-[#202c33] p-3 flex items-center space-x-3">
-            <div class="flex space-x-4 px-2 text-wa-gray text-xl">
-                <i class="far fa-smile cursor-pointer hover:text-white"></i>
-                <i class="fas fa-plus cursor-pointer hover:text-white"></i>
+        <!-- Footer Input -->
+        <footer class="bg-transparent p-2 flex items-center space-x-2 z-20 flex-shrink-0 mb-1 px-2">
+            <div class="flex-1 bg-white rounded-full flex items-center px-4 py-1 shadow-sm">
+                <i class="far fa-smile text-[#667781] text-2xl mr-3 cursor-pointer"></i>
+                <input 
+                    type="text" 
+                    id="user-input" 
+                    placeholder="Ketik pesan" 
+                    class="bg-transparent text-[#111b21] w-full border-none focus:outline-none text-[16px] placeholder:text-[#667781] py-2.5"
+                    onkeypress="handleKeyPress(event)"
+                >
+                <i class="fas fa-paperclip text-[#667781] text-xl ml-2 rotate-45 cursor-pointer"></i>
+                <i class="fas fa-camera text-[#667781] text-xl ml-4 mr-1 cursor-pointer"></i>
             </div>
-            <input 
-                type="text" 
-                id="user-input" 
-                placeholder="Ketik pesan" 
-                class="flex-1 bg-[#2a3942] text-[#e9edef] p-2.5 px-4 rounded-lg border-none focus:outline-none text-sm placeholder:text-wa-gray"
-                onkeypress="handleKeyPress(event)"
-            >
-            <button onclick="sendMessage()" class="text-wa-gray hover:text-wa-green transition-colors px-2">
-                <i class="fas fa-paper-plane text-2xl"></i>
+            <button onclick="sendMessage()" class="wa-send-btn active:scale-90 transition-transform">
+                <i class="fas fa-paper-plane"></i>
             </button>
         </footer>
     </div>
 
-    <!-- Modal Setup Awal (Hanya untuk Admin saat pertama kali) -->
-    <div id="setup-modal" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4 hidden">
-        <div class="bg-[#222e35] text-[#e9edef] p-6 rounded-lg max-w-md w-full shadow-2xl border border-gray-700">
-            <h2 class="text-xl font-bold text-wa-green mb-4">Hubungkan Spreadsheet</h2>
-            <p class="text-xs text-wa-gray mb-4">Masukkan URL CSV Google Sheets Anda. Setelah ini, Anda cukup mengedit data lewat Spreadsheet tanpa perlu ke menu ini lagi.</p>
-            <input type="text" id="sheet-url-input" placeholder="https://docs.google.com/.../pub?output=csv" class="w-full bg-[#2a3942] p-3 rounded border-none text-sm focus:ring-1 focus:ring-wa-green outline-none mb-4">
-            <button onclick="saveSheetUrl()" class="w-full bg-[#00a884] text-[#111b21] font-bold py-3 rounded hover:bg-[#06cf9c]">HUBUNGKAN SEKARANG</button>
+    <!-- Modal Setup Admin -->
+    <div id="setup-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
+        <div class="bg-white text-[#111b21] p-6 rounded-lg max-w-sm w-full shadow-2xl">
+            <h2 class="text-xl font-bold text-[#008069] mb-4">Pengaturan Chatbot</h2>
+            <p class="text-xs text-gray-500 mb-4">Masukkan URL CSV Google Sheets Anda (Publish to Web).</p>
+            <input type="text" id="sheet-url-input" placeholder="https://docs.google.com/.../pub?output=csv" class="w-full bg-gray-100 p-3 rounded border border-gray-300 text-sm focus:ring-1 focus:ring-[#00a884] outline-none mb-4">
+            <button onclick="saveSheetUrl()" class="w-full bg-[#00a884] text-white font-bold py-3 rounded hover:bg-[#008069]">SIMPAN</button>
+            <button onclick="toggleModal('setup-modal')" class="w-full mt-2 text-gray-400 text-xs underline">Batal</button>
         </div>
     </div>
 
@@ -118,10 +187,17 @@
         const userInput = document.getElementById('user-input');
 
         window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sheetFromUrl = urlParams.get('sheet');
             const savedUrl = localStorage.getItem('wa_global_sheet_url');
-            if (savedUrl) {
+
+            if (sheetFromUrl) {
+                loadAllData(sheetFromUrl);
+            } else if (savedUrl) {
+                document.getElementById('admin-setting-btn').classList.remove('hidden');
                 loadAllData(savedUrl);
             } else {
+                document.getElementById('admin-setting-btn').classList.remove('hidden');
                 toggleModal('setup-modal');
             }
         };
@@ -130,11 +206,11 @@
 
         function saveSheetUrl() {
             const url = document.getElementById('sheet-url-input').value;
-            if (url.includes('output=csv')) {
+            if (url && url.includes('output=csv')) {
                 localStorage.setItem('wa_global_sheet_url', url);
                 location.reload();
             } else {
-                alert("Gunakan link CSV yang valid!");
+                alert("Link CSV tidak valid!");
             }
         }
 
@@ -143,15 +219,6 @@
                 const response = await fetch(url);
                 const csvText = await response.text();
                 const lines = csvText.split('\n');
-
-                // Kita asumsikan struktur Spreadsheet baru:
-                // Baris 1: Header (Keyword, Response)
-                // Baris 2: [CONFIG_NAME], [Nama Bot Anda]
-                // Baris 3: [CONFIG_AVATAR], https://photos.google.com/u/0/albums?hl=es
-                // Baris 4: [CONFIG_GREETING], [Pesan Halo]
-                // Baris 5: [CONFIG_FALLBACK], [Pesan jika tidak ketemu]
-                // Baris 6 ke bawah: Kata kunci chat biasa
-
                 let tempChatData = [];
                 
                 lines.forEach((line, index) => {
@@ -177,11 +244,8 @@
 
         function applySettings() {
             document.getElementById('display-name').innerText = botSettings.name;
-            if (botSettings.avatar) {
-                document.getElementById('display-avatar').src = botSettings.avatar;
-            } else {
-                document.getElementById('display-avatar').src = `https://ui-avatars.com/api/?name=${botSettings.name}&background=00a884&color=fff`;
-            }
+            const avatarUrl = botSettings.avatar || `https://ui-avatars.com/api/?name=${botSettings.name}&background=00a884&color=fff`;
+            document.getElementById('display-avatar').src = avatarUrl;
             
             chatContainer.innerHTML = '';
             addMessageToUI(botSettings.greeting, 'in');
@@ -201,13 +265,16 @@
             const now = new Date();
             const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
             const msgDiv = document.createElement('div');
-            msgDiv.className = `flex ${type === 'out' ? 'justify-end' : 'justify-start'} mb-2`;
+            msgDiv.className = `flex ${type === 'out' ? 'justify-end' : 'justify-start'} mb-1`;
+            
+            const checkIcon = '<i class="fas fa-check-double text-[10px] text-wa-blue ml-1"></i>';
+
             msgDiv.innerHTML = `
-                <div class="${type === 'out' ? 'message-out' : 'message-in'} p-2 px-3 shadow-md max-w-[85%]">
-                    <p class="text-[14px] leading-relaxed">${text.replace(/\n/g, '<br>')}</p>
-                    <div class="flex items-center justify-end space-x-1 mt-1">
-                        <span class="text-[10px] text-wa-gray">${time}</span>
-                        ${type === 'out' ? '<i class="fas fa-check-double text-[10px] text-[#53bdeb]"></i>' : ''}
+                <div class="${type === 'out' ? 'message-out' : 'message-in'} p-1.5 px-2.5 max-w-[85%]">
+                    <p class="text-[15px] leading-snug break-words">${text.replace(/\n/g, '<br>')}</p>
+                    <div class="flex items-center justify-end space-x-1 mt-0.5">
+                        <span class="text-[10px] text-wa-time opacity-80">${time}</span>
+                        ${checkIcon}
                     </div>
                 </div>
             `;
